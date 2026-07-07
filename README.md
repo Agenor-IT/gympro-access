@@ -63,6 +63,7 @@ Debe mostrar:
 
 ```text
 executableExists: True
+workingDirectoryExists: True
 tokenConfigured: True
 ```
 
@@ -80,6 +81,8 @@ status: open_command_sent
 ```
 
 Si el molinete abre, la integracion fisica funciona.
+
+Si `C:\TangoAccess\abrir.exe` abre con doble click pero `test-open.bat` no abre, reinstalar con la ultima version del conector. El gateway ejecuta `abrir.exe` usando `C:\TangoAccess` como carpeta de trabajo.
 
 ## Configurar Chrome
 

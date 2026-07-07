@@ -46,6 +46,8 @@ $config = [ordered]@{
     Host = "127.0.0.1"
     Port = $port
     ExecutablePath = $exePath
+    WorkingDirectory = Split-Path -Parent $exePath
+    WindowStyle = "Normal"
     RequireToken = $true
     Token = $token
     MinIntervalMs = 1500
@@ -129,8 +131,9 @@ Archivos principales:
 Prueba:
 1. Ejecutar C:\GymProAccess\test-health.bat
 2. Verificar executableExists = true.
-3. Ejecutar C:\GymProAccess\test-open.bat
-4. El molinete debe abrir.
+3. Verificar workingDirectory = C:\TangoAccess.
+4. Ejecutar C:\GymProAccess\test-open.bat
+5. El molinete debe abrir.
 
 "@
 $readme | Set-Content -LiteralPath (Join-Path $installDir "README-INSTALACION.txt") -Encoding UTF8

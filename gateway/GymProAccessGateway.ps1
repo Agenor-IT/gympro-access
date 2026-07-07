@@ -11,6 +11,9 @@ $config = Get-Content -Raw -LiteralPath $configPath | ConvertFrom-Json
 $hostName = if ($config.Host) { [string]$config.Host } else { "127.0.0.1" }
 $port = if ($config.Port) { [int]$config.Port } else { 8787 }
 $executablePath = if ($config.ExecutablePath) { [string]$config.ExecutablePath } else { "C:\TangoAccess\abrir.exe" }
+$executableDir = Split-Path -Parent $executablePath
+$workingDirectory = if ($config.WorkingDirectory) { [string]$config.WorkingDirectory } elseif ($executableDir) { $executableDir } else { $baseDir }
+$windowStyle = if ($config.WindowStyle) { [string]$config.WindowStyle } else { "Normal" }
 $requireToken = if ($null -ne $config.RequireToken) { [bool]$config.RequireToken } else { $true }
 $token = if ($config.Token) { [string]$config.Token } else { "" }
 $minIntervalMs = if ($config.MinIntervalMs) { [int]$config.MinIntervalMs } else { 1500 }
@@ -62,6 +65,8 @@ $listener.Start()
 
 Write-Host "[GymProAccess] Escuchando en $prefix"
 Write-Host "[GymProAccess] Ejecutable: $executablePath"
+Write-Host "[GymProAccess] Carpeta de trabajo: $workingDirectory"
+Write-Host "[GymProAccess] Ventana: $windowStyle"
 Write-Host "[GymProAccess] Token requerido: $requireToken"
 
 while ($listener.IsListening) {
@@ -89,6 +94,9 @@ while ($listener.IsListening) {
                 ok = $true
                 executableConfigured = $executablePath
                 executableExists = [bool](Test-Path -LiteralPath $executablePath)
+                workingDirectory = $workingDirectory
+                workingDirectoryExists = [bool](Test-Path -LiteralPath $workingDirectory)
+                windowStyle = $windowStyle
                 tokenRequired = $requireToken
                 tokenConfigured = -not [string]::IsNullOrWhiteSpace($token)
             }
@@ -113,6 +121,15 @@ while ($listener.IsListening) {
                 continue
             }
 
+            if (-not (Test-Path -LiteralPath $workingDirectory)) {
+                Write-JsonResponse -Response $response -StatusCode 500 -Data @{
+                    ok = $false
+                    error = "working_directory_not_found"
+                    workingDirectory = $workingDirectory
+                }
+                continue
+            }
+
             $now = [DateTimeOffset]::UtcNow
             $elapsedMs = ($now - $script:lastOpenAt).TotalMilliseconds
             if ($elapsedMs -lt $minIntervalMs) {
@@ -125,12 +142,14 @@ while ($listener.IsListening) {
             }
 
             $script:lastOpenAt = $now
-            Start-Process -FilePath $executablePath -WindowStyle Hidden
+            $process = Start-Process -FilePath $executablePath -WorkingDirectory $workingDirectory -WindowStyle $windowStyle -PassThru
 
             Write-JsonResponse -Response $response -StatusCode 200 -Data @{
                 ok = $true
                 status = "open_command_sent"
                 executablePath = $executablePath
+                workingDirectory = $workingDirectory
+                processId = $process.Id
             }
             continue
         }

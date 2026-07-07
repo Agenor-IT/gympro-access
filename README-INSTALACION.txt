@@ -49,6 +49,7 @@ C:\GymProAccess\test-health.bat
 Resultado esperado:
 
 executableExists: True
+workingDirectoryExists: True
 tokenConfigured: True
 
 Despues ejecutar:
@@ -61,6 +62,8 @@ ok: true
 status: open_command_sent
 
 Si test-open.bat abre el molinete, la parte fisica esta funcionando.
+Si abrir.exe abre con doble click pero test-open.bat no abre, reinstalar con la ultima version del conector.
+La version corregida ejecuta abrir.exe usando C:\TangoAccess como carpeta de trabajo.
 
 5. CONFIGURACION DE CHROME / GYMPRO
 
