@@ -2,56 +2,68 @@
 
 Conector local para abrir molinetes TangoAccess desde GymPro.
 
-El instalador configura un gateway local en la PC del gimnasio:
+## Funcionamiento
 
 ```text
-http://127.0.0.1:8787/open
+GymPro -> http://127.0.0.1:8787/open -> C:\TangoAccess\abrir.exe -> molinete abre
 ```
 
-Cuando GymPro autoriza un ingreso, llama a ese gateway. El gateway ejecuta:
+El molinete no valida alumnos. Solo abre.
 
-```text
-C:\TangoAccess\abrir.exe
-```
+La validacion de DNI, tenant, alumno activo y cuota paga la hace GymPro. Si GymPro autoriza, llama al conector local.
 
-## Instalacion en la PC del gym
+## Descargar instalador
 
-1. Confirmar que el proveedor del molinete instalo:
-
-```text
-C:\TangoAccess\abrir.exe
-```
-
-2. Descargar `GymProAccessInstaller.zip` desde Releases o con este comando:
+En la PC del gym:
 
 ```powershell
 Invoke-WebRequest -Uri "https://github.com/Agenor-IT/gympro-access/releases/latest/download/GymProAccessInstaller.zip" -OutFile "$env:USERPROFILE\Downloads\GymProAccessInstaller.zip"
 ```
 
-3. Descomprimir el ZIP.
+Tambien se puede clonar el repo:
 
-4. Ejecutar:
+```powershell
+git clone https://github.com/Agenor-IT/gympro-access.git
+cd gympro-access
+```
+
+## Instalar
+
+1. Confirmar que existe:
+
+```text
+C:\TangoAccess\abrir.exe
+```
+
+2. Ejecutar como administrador:
 
 ```text
 install.bat
 ```
 
-5. Aceptar los valores por defecto, salvo que el proveedor haya cambiado la ruta de `abrir.exe`.
+3. Presionar Enter en los valores por defecto, salvo que el tecnico del molinete haya indicado otra ruta.
 
-6. Abrir:
+El instalador crea:
 
 ```text
-C:\GymProAccess\CONFIGURAR-NAVEGADOR.txt
+C:\GymProAccess
 ```
 
-7. Copiar las lineas indicadas en la consola de Chrome con GymPro abierto.
+La carpeta descargada/clonada no es la instalacion final. La instalacion final queda en `C:\GymProAccess`.
 
-## Pruebas
+## Probar instalacion
 
 Estado del gateway:
 
 ```text
 C:\GymProAccess\test-health.bat
+```
+
+Debe mostrar:
+
+```text
+executableExists: True
+tokenConfigured: True
 ```
 
 Apertura del molinete:
@@ -60,9 +72,75 @@ Apertura del molinete:
 C:\GymProAccess\test-open.bat
 ```
 
-Si `test-open.bat` abre el molinete, la integracion fisica esta funcionando.
+Debe mostrar:
 
-## Operacion diaria
+```text
+ok: true
+status: open_command_sent
+```
+
+Si el molinete abre, la integracion fisica funciona.
+
+## Configurar Chrome
+
+Abrir:
+
+```text
+C:\GymProAccess\CONFIGURAR-NAVEGADOR.txt
+```
+
+Luego:
+
+1. Abrir GymPro en Chrome.
+2. Iniciar sesion.
+3. Presionar `F12`.
+4. Ir a `Console`.
+5. Si Chrome muestra advertencia de pegado, escribir:
+
+```text
+allow pasting
+```
+
+6. Presionar Enter.
+7. Pegar las lineas de `CONFIGURAR-NAVEGADOR.txt`.
+
+La pagina se recarga por `location.reload()`. Eso es correcto.
+
+## Verificar Chrome
+
+En la consola:
+
+```js
+localStorage.getItem("gympro.tangoAccess.enabled")
+```
+
+Debe devolver:
+
+```text
+"true"
+```
+
+```js
+localStorage.getItem("gympro.tangoAccess.url")
+```
+
+Debe devolver:
+
+```text
+"http://127.0.0.1:8787/open"
+```
+
+```js
+localStorage.getItem("gympro.tangoAccess.token")
+```
+
+Debe devolver un valor que empieza con:
+
+```text
+"gympro-"
+```
+
+## Uso diario
 
 1. Abrir GymPro.
 2. Ir a Home.
@@ -70,3 +148,17 @@ Si `test-open.bat` abre el molinete, la integracion fisica esta funcionando.
 4. Mover esa ventana al monitor del alumno.
 5. El alumno ingresa DNI.
 6. Si GymPro autoriza, el molinete abre.
+
+## Si la PC se reinicia
+
+Si el instalador no pudo crear la tarea de inicio automatico, iniciar manualmente:
+
+```text
+C:\GymProAccess\start-gateway.bat
+```
+
+## Diagnostico rapido
+
+- `test-open.bat` no abre: revisar `C:\TangoAccess\abrir.exe` con el proveedor del molinete.
+- `test-open.bat` abre pero GymPro no abre: revisar `CONFIGURAR-NAVEGADOR.txt` y `localStorage`.
+- GymPro deniega: revisar DNI, cuota, alumno o tenant en GymPro.
