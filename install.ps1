@@ -135,6 +135,11 @@ Prueba:
 4. Ejecutar C:\GymProAccess\test-open.bat
 5. El molinete debe abrir.
 
+Si se apaga o reinicia la PC:
+- Si test-open.bat da error contra 127.0.0.1:8787, el gateway no esta iniciado.
+- Abrir C:\GymProAccess\start-gateway.bat y dejar esa ventana abierta.
+- Para inicio automatico sin tarea programada, crear en shell:startup un acceso directo a C:\GymProAccess\start-gateway-hidden.vbs.
+
 "@
 $readme | Set-Content -LiteralPath (Join-Path $installDir "README-INSTALACION.txt") -Encoding UTF8
 

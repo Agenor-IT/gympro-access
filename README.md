@@ -160,8 +160,59 @@ Si el instalador no pudo crear la tarea de inicio automatico, iniciar manualment
 C:\GymProAccess\start-gateway.bat
 ```
 
+Dejar esa ventana abierta. Ese proceso es el puente local:
+
+```text
+GymPro -> 127.0.0.1:8787 -> C:\TangoAccess\abrir.exe
+```
+
+Si no esta corriendo, GymPro puede aceptar el DNI pero no va a llegar la orden de apertura al molinete.
+
+Para dejarlo permanente sin tarea programada:
+
+1. Presionar `Win + R`.
+2. Escribir:
+
+```text
+shell:startup
+```
+
+3. Presionar Enter.
+4. Crear un acceso directo a:
+
+```text
+C:\GymProAccess\start-gateway-hidden.vbs
+```
+
+Con eso, Windows inicia el gateway cuando entra al usuario.
+
+## Error despues de apagar y prender
+
+Si `test-open.bat` muestra algo como:
+
+```text
+No es posible conectar con el servidor remoto
+No connection could be made
+127.0.0.1:8787
+```
+
+El gateway local no esta levantado.
+
+Solucion:
+
+```text
+C:\GymProAccess\start-gateway.bat
+```
+
+Despues volver a probar:
+
+```text
+C:\GymProAccess\test-open.bat
+```
+
 ## Diagnostico rapido
 
 - `test-open.bat` no abre: revisar `C:\TangoAccess\abrir.exe` con el proveedor del molinete.
 - `test-open.bat` abre pero GymPro no abre: revisar `CONFIGURAR-NAVEGADOR.txt` y `localStorage`.
+- `test-open.bat` da error contra `127.0.0.1:8787`: abrir `C:\GymProAccess\start-gateway.bat` y dejarlo corriendo.
 - GymPro deniega: revisar DNI, cuota, alumno o tenant en GymPro.

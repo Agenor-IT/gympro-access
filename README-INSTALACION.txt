@@ -40,6 +40,22 @@ Significa que, si se reinicia la PC, puede hacer falta iniciar manualmente:
 
 C:\GymProAccess\start-gateway.bat
 
+El gateway es el puente local entre GymPro y el molinete. Si la PC se apaga o reinicia y el gateway no vuelve a iniciar, GymPro valida el DNI pero no puede mandar la orden de apertura.
+
+Para dejarlo permanente sin tarea programada:
+
+- Presionar Win + R
+- Escribir:
+
+shell:startup
+
+- Presionar Enter
+- Crear un acceso directo a:
+
+C:\GymProAccess\start-gateway-hidden.vbs
+
+Con eso, Windows lo inicia al entrar al usuario.
+
 4. PRUEBA DEL CONECTOR
 
 Ejecutar:
@@ -129,13 +145,39 @@ Resultado esperado:
 - Alumno autorizado: pantalla verde y molinete abre
 - Alumno no autorizado: pantalla roja y molinete no abre
 
-8. DIAGNOSTICO RAPIDO
+8. DESPUES DE APAGAR Y PRENDER LA PC
+
+Si despues de reiniciar la PC el test muestra un error tipo:
+
+No es posible conectar con el servidor remoto
+No connection could be made
+127.0.0.1:8787
+
+El gateway local no esta corriendo.
+
+Solucion inmediata:
+
+- Abrir:
+
+C:\GymProAccess\start-gateway.bat
+
+- Dejar esa ventana abierta
+- Ejecutar:
+
+C:\GymProAccess\test-open.bat
+
+Si asi abre el molinete, la integracion esta bien. Solo falta dejar configurado el inicio automatico con shell:startup.
+
+9. DIAGNOSTICO RAPIDO
 
 Si test-open.bat no abre:
 El problema esta en C:\TangoAccess\abrir.exe o en la configuracion del proveedor del molinete.
 
 Si test-open.bat abre, pero GymPro no abre:
 Revisar CONFIGURAR-NAVEGADOR.txt y los 3 valores de localStorage.
+
+Si test-open.bat muestra error de conexion a 127.0.0.1:8787:
+El gateway no esta iniciado. Abrir C:\GymProAccess\start-gateway.bat y dejarlo abierto.
 
 Si GymPro muestra acceso denegado:
 Revisar el alumno, DNI, cuota o tenant dentro de GymPro.
